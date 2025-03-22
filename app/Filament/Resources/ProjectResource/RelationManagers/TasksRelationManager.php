@@ -21,6 +21,22 @@ class TasksRelationManager extends RelationManager
                 Forms\Components\TextInput::make('title')
                     ->required()
                     ->maxLength(255),
+                Forms\Components\Textarea::make('description')
+                    ->maxLength(65535),
+                Forms\Components\Select::make('user_id')
+                    ->relationship('user', 'name')
+                    ->required(),
+                Forms\Components\TextInput::make('priority')
+                    ->numeric()
+                    ->default(0),
+                Forms\Components\Select::make('status')
+                    ->options([
+                        'pending' => 'Pending',
+                        'in_progress' => 'In Progress',
+                        'completed' => 'Completed',
+                    ])
+                    ->required(),
+                Forms\Components\DatePicker::make('due_date'),
             ]);
     }
 
@@ -30,9 +46,19 @@ class TasksRelationManager extends RelationManager
             ->recordTitleAttribute('title')
             ->columns([
                 Tables\Columns\TextColumn::make('title'),
+                Tables\Columns\TextColumn::make('user.name'),
+                Tables\Columns\TextColumn::make('priority'),
+                Tables\Columns\TextColumn::make('status'),
+                Tables\Columns\TextColumn::make('due_date')
+                    ->date(),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('status')
+                    ->options([
+                        'pending' => 'Pending',
+                        'in_progress' => 'In Progress',
+                        'completed' => 'Completed',
+                    ]),
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make(),
