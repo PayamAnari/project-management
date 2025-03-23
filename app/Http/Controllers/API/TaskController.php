@@ -7,6 +7,7 @@ use App\Models\Task;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Events\TaskUpdated;
 
 class TaskController extends Controller
 {
@@ -122,6 +123,9 @@ class TaskController extends Controller
 
         $task->update($request->all());
 
+        // Broadcast the task update event
+        event(new TaskUpdated($task));
+
         return response()->json($task);
     }
 
@@ -155,6 +159,9 @@ class TaskController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
+        $updatedTasks = [];
+
+
         foreach ($request->tasks as $taskData) {
             $task = Task::findOrFail($taskData['id']);
             
@@ -165,6 +172,13 @@ class TaskController extends Controller
             
             $task->priority = $taskData['priority'];
             $task->save();
+
+            $updatedTasks[] = $task;
+        }
+
+        // Broadcast the task update event
+        foreach ($updatedTasks as $task) {
+            event(new TaskUpdated($task));
         }
 
         return response()->json(['message' => 'Task priorities updated successfully']);
