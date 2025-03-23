@@ -27,3 +27,4 @@ Route::middleware('auth:sanctum')->group(function () {
     // Comment routes
     Route::apiResource('comments', CommentController::class);
 });
+
