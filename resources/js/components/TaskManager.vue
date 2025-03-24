@@ -550,6 +550,9 @@ export default {
         this.comments.unshift(response.data);
         this.newComment = '';
         this.showNotification('Success', 'Comment added', 'success');
+
+        this.closeTaskDetail();
+
       } catch (error) {
         this.showNotification('Error', 'Failed to add comment', 'error');
         console.error('Error adding comment:', error);
