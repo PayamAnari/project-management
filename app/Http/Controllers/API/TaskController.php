@@ -125,7 +125,7 @@ class TaskController extends Controller
         $task->update($request->all());
 
         // Broadcast the task update event
-        event(new TaskUpdated($task));
+        event(new TaskUpdated($task, 'update'));
 
         return response()->json($task);
     }

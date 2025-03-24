@@ -355,7 +355,10 @@ export default {
     logout() {
       localStorage.removeItem('authToken'); 
       this.isAuthenticated = false; 
-      //this.$router.push('/login');
+    },
+    closeTaskModal() {
+      this.selectedTask = null; 
+      this.isTaskModalOpen = false;
     },
     
     async fetchProjects() {
@@ -480,6 +483,10 @@ export default {
         }
         
         this.showNotification('Success', 'Task status updated', 'success');
+
+        this.closeTaskModal();
+
+        
       } catch (error) {
         this.showNotification('Error', 'Failed to update task status', 'error');
         console.error('Error updating task status:', error);
