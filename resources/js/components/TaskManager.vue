@@ -40,6 +40,7 @@
           <project-list 
             :projects="projects"
             :selected-project="selectedProject"
+            @delete-project="handleDeleteProject"
             @project-selected="selectProject"
             @open-project-modal="showProjectModal = true" />
         </div>
@@ -52,6 +53,7 @@
             @update:tasks="tasks = $event"
             @task-selected="selectTask"
             @open-task-modal="openTaskModal"
+            @delete-task="handleDeleteTask"
             @task-reordered="onTaskReorder" />
         </div>
       </div>
@@ -76,10 +78,12 @@
       :task="selectedTask"
       :comments="comments"
       :new-comment="newComment"
+      :user="user"
       @close="closeTaskDetail"
       @update-task-status="updateTaskStatus"
       @add-comment="addComment"
-      @update-comment="newComment = $event" />
+      @update-comment="newComment = $event"
+      @delete-comment="handleDeleteComment" />
     
     <notification 
       :notifications="notifications"
@@ -155,6 +159,7 @@ export default {
     this.fetchProjects();
     this.setupRealTimeListeners();
   },
+
   methods: {
     async checkAuth() {
       const token = localStorage.getItem('authToken');
@@ -253,6 +258,15 @@ export default {
         console.error('Error fetching projects:', error);
       }
     },
+      async handleDeleteProject(projectId) {
+        try {
+          await axios.delete(`/api/projects/${projectId}`);
+          this.projects = this.projects.filter(p => p.id !== projectId);
+        } catch (error) {
+          console.error('Error deleting project:', error);
+        }
+      },
+   
     async fetchTasks(projectId) {
       try {
         const response = await axios.get(`/api/tasks?project_id=${projectId}`, {
@@ -266,6 +280,7 @@ export default {
         console.error('Error fetching tasks:', error);
       }
     },
+    
     async fetchComments(taskId) {
       try {
         const response = await axios.get(`/api/comments?task_id=${taskId}`);
@@ -375,12 +390,20 @@ export default {
         this.newComment = '';
         this.showNotification('Success', 'Comment added', 'success');
 
-        this.closeTaskDetail();
-
       } catch (error) {
         this.showNotification('Error', 'Failed to add comment', 'error');
         console.error('Error adding comment:', error);
       }
+    },
+      async handleDeleteComment(commentId) {
+        try {
+          await axios.delete(`/api/comments/${commentId}`);
+          this.comments = this.comments.filter(c => c.id !== commentId);
+          this.showNotification('Success', 'Comment deleted', 'success');
+        } catch (error) {
+          this.showNotification('Error', 'Failed to delete comment', 'error');
+          console.error('Error deleting comment:', error);
+        }
     },
     async updateTaskStatus() {
       try {

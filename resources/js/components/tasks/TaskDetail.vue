@@ -35,7 +35,9 @@
               :comments="comments"
               @add-comment="$emit('add-comment', 'newComment')"
               :new-comment="newComment"
-              @update-comment="$emit('update-comment', $event)" />
+              @update-comment="$emit('update-comment', $event)" 
+              @delete-comment="$emit('delete-comment', $event)"
+              :current-user="user"/>
       </div>
   </div>
 </template>
@@ -51,7 +53,8 @@ export default {
       show: Boolean,
       task: Object,
       comments: Array,
-      newComment: String
+      newComment: String,
+      user: Object
   },
   methods: {
       formatDate(dateString) {
