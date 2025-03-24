@@ -60,7 +60,7 @@
           <div class="bg-gray-50 p-4 rounded-lg shadow-md col-span-2" v-if="selectedProject">
             <div class="flex justify-between items-center mb-4">
               <h3 class="text-lg font-semibold">Tasks for {{ selectedProject.name }}</h3>
-              <button @click="showTaskModal = true;" class="px-4 py-2 text-white bg-blue-500 hover:bg-gray-800 hover:text-white text-xs font-semibold  shadow-md rounded-md">
+              <button @click="openTaskModal" class="px-4 py-2 text-white bg-blue-500 hover:bg-gray-800 hover:text-white text-xs font-semibold  shadow-md rounded-md">
                 Add Task
               </button>
             </div>
@@ -383,7 +383,7 @@ export default {
     },
     async fetchUsers() {
       try {
-        const response = await axios.get('/api/user', {
+        const response = await axios.get('/api/users', {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('authToken')}`
           }
@@ -394,6 +394,20 @@ export default {
         console.error('Error fetching users:', error);
       }
    },
+   async openTaskModal() {
+      this.newTask = { 
+        title: '',
+        description: '',
+        due_date: '',
+        status: 'to_do',
+        priority: 0,
+        attachments: [],
+        assigned_user_id: ''
+      };
+      await this.fetchUsers(); 
+      this.showTaskModal = true;
+    },
+
     closeTaskModal() {
       this.selectedTask = null; 
       this.isTaskModalOpen = false;

@@ -27,6 +27,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::middleware('auth:sanctum')->group(function () {
+
+    Route::get('/users', function() {
+        return \App\Models\User::select('id', 'name')->get();
+    });
+
     // Project routes
     Route::apiResource('projects', ProjectController::class);
     
