@@ -40,13 +40,20 @@ class TaskResource extends Resource
                     ->default(0),
                 Forms\Components\Select::make('status')
                     ->options([
-                        'pending' => 'Pending',
+                        'to_do' => 'To Do',
                         'in_progress' => 'In Progress',
+                        'under_review' => 'Under Review',
                         'completed' => 'Completed',
                     ])
                     ->required(),
                 Forms\Components\DatePicker::make('due_date'),
-            ]);
+                Forms\Components\FileUpload::make('attachments')
+                    ->multiple()
+                    ->directory('task_attachments')
+                    ->visibility(('private'))
+                    ->maxFiles(5)
+                    ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']),
+                ]);
     }
 
     public static function table(Table $table): Table
@@ -81,8 +88,9 @@ class TaskResource extends Resource
                     ->relationship('project', 'name'),
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
-                        'pending' => 'Pending',
+                        'to_do' => 'To Do',
                         'in_progress' => 'In Progress',
+                        'under_review' => 'Under Review',
                         'completed' => 'Completed',
                     ]),
             ])

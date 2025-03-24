@@ -31,10 +31,11 @@ class TasksRelationManager extends RelationManager
                     ->default(0),
                 Forms\Components\Select::make('status')
                     ->options([
-                        'pending' => 'Pending',
+                        'to_do' => 'To Do',
                         'in_progress' => 'In Progress',
+                        'under_review' => 'Under Review',
                         'completed' => 'Completed',
-                    ])
+                    ])  
                     ->required(),
                 Forms\Components\DatePicker::make('due_date'),
             ]);
@@ -55,8 +56,9 @@ class TasksRelationManager extends RelationManager
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
-                        'pending' => 'Pending',
+                        'to_do' => 'To Do',
                         'in_progress' => 'In Progress',
+                        'under_review' => 'Under Review',
                         'completed' => 'Completed',
                     ]),
             ])

@@ -60,7 +60,7 @@
           <div class="bg-gray-50 p-4 rounded-lg shadow-md col-span-2" v-if="selectedProject">
             <div class="flex justify-between items-center mb-4">
               <h3 class="text-lg font-semibold">Tasks for {{ selectedProject.name }}</h3>
-              <button @click="showTaskModal = true" class="px-4 py-2 text-white bg-blue-500 hover:bg-gray-800 hover:text-white text-xs font-semibold  shadow-md rounded-md">
+              <button @click="showTaskModal = true;" class="px-4 py-2 text-white bg-blue-500 hover:bg-gray-800 hover:text-white text-xs font-semibold  shadow-md rounded-md">
                 Add Task
               </button>
             </div>
@@ -126,7 +126,8 @@
             <div>
               <div class="text-sm font-semibold text-gray-500 mb-1">Status</div>
               <select v-model="selectedTask.status" class="w-full border rounded p-2" @change="updateTaskStatus">
-                <option value="pending">Pending</option>
+                <option value="to_do">To Do</option>
+                <option value="under_review">Under Review</option>
                 <option value="in_progress">In Progress</option>
                 <option value="completed">Completed</option>
               </select>
@@ -217,49 +218,70 @@
       </div>
       
       <!-- Task Modal -->
-      <div v-if="showTaskModal && selectedProject" class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="text-xl font-bold">New Task</h3>
-            <button @click="showTaskModal = false" class="text-gray-500 hover:text-gray-700">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+<div v-if="showTaskModal && selectedProject" class="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+  <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold">New Task</h3>
+      <button @click="showTaskModal = false" class="text-gray-500 hover:text-gray-700">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+    
+        <form @submit.prevent="createTask">
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+            <input type="text" v-model="newTask.title" class="w-full border rounded p-2" required>
           </div>
           
-          <form @submit.prevent="createTask">
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
-              <input type="text" v-model="newTask.title" class="w-full border rounded p-2" required>
-            </div>
-            
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-              <textarea v-model="newTask.description" class="w-full border rounded p-2" rows="3"></textarea>
-            </div>
-            
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
-              <input type="date" v-model="newTask.due_date" class="w-full border rounded p-2">
-            </div>
-            
-            <div class="mb-4">
-              <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-              <select v-model="newTask.status" class="w-full border rounded p-2" required>
-                <option value="pending">Pending</option>
-                <option value="in_progress">In Progress</option>
-                <option value="completed">Completed</option>
-              </select>
-            </div>
-            
-            <div class="flex justify-end gap-2">
-              <button type="button" @click="showTaskModal = false" class="px-4 py-2 text-white bg-gray-500 hover:bg-gray-800 hover:text-white text-xs font-semibold  shadow-md rounded-md">Cancel</button>
-              <button type="submit" class="px-4 py-2 text-white bg-blue-500 hover:bg-gray-800 hover:text-white text-xs font-semibold  shadow-md rounded-md">Create Task</button>
-            </div>
-          </form>
-        </div>
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+            <textarea v-model="newTask.description" class="w-full border rounded p-2" rows="3"></textarea>
+          </div>
+          
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+            <input type="number" v-model="newTask.priority" class="w-full border rounded p-2" min="0">
+          </div>
+          
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
+            <input type="date" v-model="newTask.due_date" class="w-full border rounded p-2">
+          </div>
+          
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <select v-model="newTask.status" class="w-full border rounded p-2" required>
+              <option value="to_do">To Do</option>
+              <option value="under_review">Under Review</option>
+              <option value="in_progress">In Progress</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+
+                    <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Assign To</label>
+            <select v-model="newTask.assigned_user_id" class="w-full border rounded p-2">
+              <option value="">Unassigned</option>
+              <option v-for="user in availableUsers" :key="user.id" :value="user.id">
+                {{ user.name }}
+              </option>
+            </select>
+          </div>
+          
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Attachments</label>
+            <input type="file" @change="handleFileUpload" multiple class="w-full border rounded p-2">
+          </div>
+          
+          <div class="flex justify-end gap-2">
+            <button type="button" @click="showTaskModal = false" class="px-4 py-2 text-white bg-gray-500 hover:bg-gray-800 hover:text-white text-xs font-semibold shadow-md rounded-md">Cancel</button>
+            <button type="submit" class="px-4 py-2 text-white bg-blue-500 hover:bg-gray-800 hover:text-white text-xs font-semibold shadow-md rounded-md">Create Task</button>
+          </div>
+        </form>
       </div>
+    </div>
       
       <!-- Notification Component -->
       <div class="fixed bottom-4 right-4 max-w-md w-full">
@@ -298,6 +320,7 @@ export default {
       user: {
         name: ''
       },
+      availableUsers: [],
       projects: [],
       tasks: [],
       comments: [],
@@ -316,7 +339,9 @@ export default {
         title: '',
         description: '',
         due_date: '',
-        status: 'pending'
+        status: 'to_do',
+        priority: 0,
+        attachments: []
       },
       newComment: '',
       notifications: [],
@@ -356,14 +381,34 @@ export default {
       localStorage.removeItem('authToken'); 
       this.isAuthenticated = false; 
     },
+    async fetchUsers() {
+      try {
+        const response = await axios.get('/api/user', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          }
+        });
+        this.availableUsers = response.data;
+      } catch (error) {
+        this.showNotification('Error', 'Failed to load users', 'error');
+        console.error('Error fetching users:', error);
+      }
+   },
     closeTaskModal() {
       this.selectedTask = null; 
       this.isTaskModalOpen = false;
     },
-    
+    handleFileUpload(event) {
+      this.newTask.attachments = Array.from(event.target.files);
+    },
+  
     async fetchProjects() {
       try {
-        const response = await axios.get('/api/projects');
+        const response = await axios.get('/api/projects', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          }
+        });
         this.projects = response.data;
       } catch (error) {
         this.showNotification('Error', 'Failed to load projects', 'error');
@@ -372,7 +417,11 @@ export default {
     },
     async fetchTasks(projectId) {
       try {
-        const response = await axios.get(`/api/tasks?project_id=${projectId}`);
+        const response = await axios.get(`/api/tasks?project_id=${projectId}`, {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+          }
+        });
         this.tasks = response.data;
       } catch (error) {
         this.showNotification('Error', 'Failed to load tasks', 'error');
@@ -423,30 +472,57 @@ export default {
       }
     },
     async createTask() {
-      try {
-        const taskData = {
-          ...this.newTask,
-          project_id: this.selectedProject.id,
-          priority: this.tasks.length
-        };
-        
-        const response = await axios.post('/api/tasks', taskData);
-        this.tasks.push(response.data);
-        this.showNotification('Success', 'Task created successfully', 'success');
-        
-        // Reset form and close modal
-        this.newTask = {
-          title: '',
-          description: '',
-          due_date: '',
-          status: 'pending'
-        };
-        this.showTaskModal = false;
-      } catch (error) {
-        this.showNotification('Error', 'Failed to create task', 'error');
-        console.error('Error creating task:', error);
+  try {
+    const taskData = new FormData();
+    
+    taskData.append('title', this.newTask.title);
+    taskData.append('description', this.newTask.description);
+    taskData.append('project_id', this.selectedProject.id);
+    taskData.append('priority', this.newTask.priority);
+    taskData.append('status', this.newTask.status);
+    taskData.append('due_date', this.newTask.due_date);
+    
+    // Change assigned_user_id to user_id
+    if (this.newTask.assigned_user_id) {
+      taskData.append('user_id', this.newTask.assigned_user_id);
+    } else {
+      // Default to the current user if no assignment is made
+      taskData.append('user_id', this.user.id);
+    }
+    
+    // Add attachment files if any
+    if (this.newTask.attachments.length > 0) {
+      this.newTask.attachments.forEach((file, index) => {
+        taskData.append(`attachments[${index}]`, file);
+      });
+    }
+    
+    const response = await axios.post('/api/tasks', taskData, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        'Content-Type': 'multipart/form-data'
       }
-    },
+    });
+    
+    this.tasks.push(response.data);
+    this.showNotification('Success', 'Task created successfully', 'success');
+    
+    // Reset form and close modal
+    this.newTask = {
+      title: '',
+      description: '',
+      due_date: '',
+      status: 'to_do',
+      priority: 0,
+      attachments: [],
+      assigned_user_id: '' 
+    };
+    this.showTaskModal = false;
+  } catch (error) {
+    this.showNotification('Error', 'Failed to create task', 'error');
+    console.error('Error creating task:', error);
+  }
+},
     async addComment() {
       if (!this.newComment.trim()) return;
       
@@ -468,12 +544,12 @@ export default {
     async updateTaskStatus() {
       try {
         await axios.put(`/api/tasks/${this.selectedTask.id}`, {
-          title: this.selectedTask.title,
-          description: this.selectedTask.description,
+          title: this.selectedTask.title || '',
+          description: this.selectedTask.description || '',
           project_id: this.selectedTask.project_id,
           status: this.selectedTask.status,
-          priority: this.selectedTask.priority,
-          due_date: this.selectedTask.due_date
+          priority: this.selectedTask.priority || 0,
+          due_date: this.selectedTask.due_date || null,
         });
         
         // Update the task in the tasks array
@@ -556,15 +632,17 @@ export default {
     },
     getTaskStatusClass(status) {
       return {
-        'bg-red-100 text-red-800': status === 'pending',
+        'bg-red-100 text-red-800': status === 'to_do',
         'bg-yellow-100 text-yellow-800': status === 'in_progress',
+        'bg-purple-100 text-purple-800': status === 'under_review',
         'bg-green-100 text-green-800': status === 'completed'
       };
     },
     formatTaskStatus(status) {
       switch (status) {
-        case 'pending': return 'Pending';
+        case 'to_do': return 'To Do';
         case 'in_progress': return 'In Progress';
+        case 'under_review': return 'Under Review';
         case 'completed': return 'Completed';
         default: return status;
       }

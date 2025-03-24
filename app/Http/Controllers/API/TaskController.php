@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Events\TaskUpdated;
 use Illuminate\Support\Facades\DB;
+use App\Models\TaskAttachment;
+use Illuminate\Support\Facades\Storage;
 
 class TaskController extends Controller
 {
@@ -50,9 +52,12 @@ class TaskController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'project_id' => 'required|exists:projects,id',
-            'status' => 'required|in:pending,in_progress,completed',
+            'status' => 'required|in:to_do,in_progress,under_review,completed',
             'priority' => 'numeric',
             'due_date' => 'nullable|date',
+            'user_id' => 'required|exists:users,id',
+            'attachments' => 'nullable|array',
+            'attachments.*' => 'file|max:10240'
         ]);
 
         if ($validator->fails()) {
@@ -64,19 +69,41 @@ class TaskController extends Controller
         if ($project->user_id !== auth()->id()) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
+        
+        DB::beginTransaction();
 
+        try {
         $task = Task::create([
             'title' => $request->title,
             'description' => $request->description,
             'project_id' => $request->project_id,
-            'user_id' => auth()->id(),
+            'user_id' => $request->user_id,
             'priority' => $request->priority ?? 0,
             'status' => $request->status,
             'due_date' => $request->due_date,
         ]);
 
-        return response()->json($task, 201);
+         // Handle file attachments
+         if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+                $path = $file->store('task_attachments');
+                
+                $task->attachments()->create([
+                    'file_path' => $path,
+                    'original_name' => $file->getClientOriginalName(),
+                    'mime_type' => $file->getClientMimeType(),
+                    'size' => $file->getSize()
+                ]);
+            }
+        }
+        
+        DB::commit();
+        return response()->json($task->load('project', 'user', 'attachments'), 201);
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return response()->json(['message' => 'Task creation failed'], 500);
     }
+}
 
     /**
      * Display the specified resource.
@@ -88,7 +115,7 @@ class TaskController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        return response()->json($task->load('project', 'user', 'comments.user'));
+        return response()->json($task->load('project', 'user', 'comments.user', 'attachments'));
     }
 
     /**
@@ -105,7 +132,7 @@ class TaskController extends Controller
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'project_id' => 'required|exists:projects,id',
-            'status' => 'required|in:pending,in_progress,completed',
+            'status' => 'required|in:to_do,in_progress,under_review,completed',
             'priority' => 'numeric',
             'due_date' => 'nullable|date',
         ]);
@@ -189,5 +216,40 @@ class TaskController extends Controller
             return response()->json(['message' => 'Update failed'], 500);
         }
     }
+
+    public function addAttachment(Request $request, Task $task)
+{
+    if ($task->project->user_id !== auth()->id()) {
+        return response()->json(['message' => 'Unauthorized'], 403);
+    }
+
+    $request->validate([
+        'file' => 'required|file|max:10240' // 10MB max
+    ]);
+
+    $file = $request->file('file');
+    $path = $file->store('task_attachments');
+    
+    $attachment = $task->attachments()->create([
+        'file_path' => $path,
+        'original_name' => $file->getClientOriginalName(),
+        'mime_type' => $file->getClientMimeType(),
+        'size' => $file->getSize()
+    ]);
+
+    return response()->json($attachment, 201);
+}
+
+public function deleteAttachment(Task $task, TaskAttachment $attachment)
+{
+    if ($task->project->user_id !== auth()->id() || $attachment->task_id !== $task->id) {
+        return response()->json(['message' => 'Unauthorized'], 403);
+    }
+
+    Storage::delete($attachment->file_path);
+    $attachment->delete();
+
+    return response()->json(null, 204);
+}
 
 };

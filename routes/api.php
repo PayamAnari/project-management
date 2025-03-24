@@ -32,6 +32,8 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // Task routes
     Route::apiResource('tasks', TaskController::class);
+    Route::post('tasks/{task}/attachments', [TaskController::class, 'addAttachment']);
+    Route::delete('tasks/{task}/attachments/{attachment}', [TaskController::class, 'deleteAttachment']);
     Route::post('tasks/update-priorities', [TaskController::class, 'updatePriorities']);
     
     // Comment routes
