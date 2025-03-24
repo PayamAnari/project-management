@@ -4,7 +4,6 @@ import TaskManager from './components/TaskManager.vue';
 
 const app = createApp(TaskManager);
 
-app.component('task-manager', TaskManager);
 
 app.mount('#app');
 
