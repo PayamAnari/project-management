@@ -378,9 +378,22 @@ export default {
       this.showLoginModal = false;
     },
     logout() {
-      localStorage.removeItem('authToken'); 
-      this.isAuthenticated = false; 
-    },
+      localStorage.removeItem('authToken');
+      this.isAuthenticated = false;
+      this.user = { name: '' };
+      
+      this.projects = [];
+      this.tasks = [];
+      this.comments = [];
+      this.selectedProject = null;
+      this.selectedTask = null;
+      
+      this.showTaskModal = false;
+      this.showProjectModal = false;
+      this.showTaskDetailModal = false;
+      
+      this.showNotification('Success', 'You have been logged out', 'success');
+},
     async fetchUsers() {
       try {
         const response = await axios.get('/api/users', {
@@ -417,6 +430,13 @@ export default {
     },
   
     async fetchProjects() {
+
+      if (!this.isAuthenticated) {
+          this.projects = [];
+          return;
+        }
+
+        
       try {
         const response = await axios.get('/api/projects', {
           headers: {
