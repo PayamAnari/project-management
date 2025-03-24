@@ -9,6 +9,9 @@ use App\Models\Project;
 |--------------------------------------------------------------------------
 */
 
+Broadcast::routes();
+
+
 Broadcast::channel('project.{projectId}', function ($user, $projectId) {
     $project = Project::findOrFail($projectId);
     return $user->id === $project->user_id;

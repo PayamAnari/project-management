@@ -4,6 +4,7 @@
     "laravel-echo": "^2.0.2",
     "pusher-js": "^8.4.0",
     "vue-loader": "^17.4.2",
+    "vue-router": "^4.5.0",
     "vuedraggable": "^4.1.0"
   },
   "devDependencies": {

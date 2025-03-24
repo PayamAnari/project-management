@@ -16,13 +16,17 @@ class TaskUpdated implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $task;
+    public $action;
+    public $user;
 
     /**
      * Create a new event instance.
      */
-    public function __construct(Task $task)
+    public function __construct(Task $task, string $action)
     {
         $this->task = $task;
+        $this->action = $action;
+        $this->user = auth()->user();
     }
 
     /**
@@ -34,6 +38,24 @@ class TaskUpdated implements ShouldBroadcast
     {
         return [
             new PrivateChannel('project.' . $this->task->project_id),
+        ];
+    }
+
+    /**
+     * Get the data to broadcast.
+     *
+     * @return array
+     */
+    public function broadcastWith(): array
+    {
+        return [
+            'task' => $this->task->load('user'),
+            'action' => $this->action,
+            'user' => [
+                'id' => $this->user->id,
+                'name' => $this->user->name,
+            ],
+            'timestamp' => now()->toIso8601String(),
         ];
     }
 }

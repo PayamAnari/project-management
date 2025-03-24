@@ -8,6 +8,7 @@ use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Events\TaskUpdated;
+use Illuminate\Support\Facades\DB;
 
 class TaskController extends Controller
 {
@@ -154,34 +155,39 @@ class TaskController extends Controller
             'tasks.*.id' => 'required|exists:tasks,id',
             'tasks.*.priority' => 'required|numeric',
         ]);
-
+    
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-
-        $updatedTasks = [];
-
-
-        foreach ($request->tasks as $taskData) {
-            $task = Task::findOrFail($taskData['id']);
-            
-            // Check if the authenticated user owns the project that the task belongs to
-            if ($task->project->user_id !== auth()->id()) {
-                return response()->json(['message' => 'Unauthorized'], 403);
+    
+        try {
+            DB::beginTransaction();
+    
+            $updatedTasks = [];
+            foreach ($request->tasks as $taskData) {
+                $task = Task::findOrFail($taskData['id']);
+                
+                if ($task->project->user_id !== auth()->id()) {
+                    DB::rollBack();
+                    return response()->json(['message' => 'Unauthorized'], 403);
+                }
+                
+                $task->priority = $taskData['priority'];
+                $task->save();
+                $updatedTasks[] = $task;
             }
-            
-            $task->priority = $taskData['priority'];
-            $task->save();
-
-            $updatedTasks[] = $task;
+    
+            DB::commit();
+    
+            foreach ($updatedTasks as $task) {
+                event(new TaskUpdated($task, 'priority'));
+            }
+    
+            return response()->json(['message' => 'Task priorities updated successfully']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['message' => 'Update failed'], 500);
         }
-
-        // Broadcast the task update event
-        foreach ($updatedTasks as $task) {
-            event(new TaskUpdated($task));
-        }
-
-        return response()->json(['message' => 'Task priorities updated successfully']);
     }
 
 };
