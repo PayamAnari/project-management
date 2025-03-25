@@ -63,10 +63,10 @@ export default {
   } catch (error) {
     if (error.response) {
       console.error('Error response:', error.response.data);
-      this.showNotification(error.response.data.message);
+      alert(error.response.data.message);
     } else {
       console.error('Login failed:', error);
-      this.showNotification('Login failed. Please try again.');
+      alert('Login failed. Please try again.');
     }
   }
 }
