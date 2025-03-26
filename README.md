@@ -19,7 +19,7 @@
   <img 
     width="1200"
     alt="home"
-    src="https://live.staticflickr.com/65535/54408155796_17ac116345_h.jpg"/>
+    src="https://live.staticflickr.com/65535/54412439571_387689dbb5.jpg"/>
 </p>
 
 ---
@@ -36,7 +36,7 @@
   <img 
     width="1200"
     alt="home"
-    src="https://live.staticflickr.com/65535/54408212311_a65c47261d_z.jpg"/>
+    src="https://live.staticflickr.com/65535/54412822825_5b5a176d57.jpg"/>
 </p>
 
 
