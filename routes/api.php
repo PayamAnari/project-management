@@ -40,6 +40,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('tasks/{task}/attachments', [TaskController::class, 'addAttachment']);
     Route::delete('tasks/{task}/attachments/{attachment}', [TaskController::class, 'deleteAttachment']);
     Route::post('tasks/update-priorities', [TaskController::class, 'updatePriorities']);
+    Route::get('/attachments/{attachment}/download', [TaskController::class, 'downloadAttachment']);
+    
     
     // Comment routes
     Route::apiResource('comments', CommentController::class);

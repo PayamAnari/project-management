@@ -50,9 +50,11 @@ class TaskResource extends Resource
                 Forms\Components\FileUpload::make('attachments')
                     ->multiple()
                     ->directory('task_attachments')
+                    ->disk('local')
                     ->visibility(('private'))
                     ->maxFiles(5)
                     ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']),
+
                 ]);
     }
 
@@ -104,11 +106,13 @@ class TaskResource extends Resource
                 ]),
             ]);
     }
+    
 
     public static function getRelations(): array
     {
         return [
             RelationManagers\CommentsRelationManager::class,
+            RelationManagers\AttachmentsRelationManager::class,
         ];
     }
 

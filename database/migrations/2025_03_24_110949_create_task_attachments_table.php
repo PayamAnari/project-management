@@ -16,6 +16,9 @@ return new class extends Migration
             $table->string('mime_type');
             $table->unsignedInteger('size');
             $table->timestamps();
+
+            $table->foreign('task_id')->references('id')->on('tasks')->onDelete('cascade');
+
         });
     }
 

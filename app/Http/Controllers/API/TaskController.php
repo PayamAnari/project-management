@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\TaskAttachment;
 use Illuminate\Support\Facades\Storage;
 
+
 class TaskController extends Controller
 {
     /**
@@ -19,20 +20,15 @@ class TaskController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Task::with(['project', 'user']);
+        $query = Task::with(['project', 'user', 'attachments']); 
         
-        // Filter by project if provided
         if ($request->has('project_id')) {
             $project = Project::findOrFail($request->project_id);
-            
-            // Check if the authenticated user owns the project
             if ($project->user_id !== auth()->id()) {
                 return response()->json(['message' => 'Unauthorized'], 403);
             }
-            
             $query->where('project_id', $request->project_id);
         } else {
-            // Otherwise, only show tasks from projects owned by the user
             $query->whereHas('project', function ($q) {
                 $q->where('user_id', auth()->id());
             });
@@ -216,6 +212,7 @@ class TaskController extends Controller
             return response()->json(['message' => 'Update failed'], 500);
         }
     }
+    
 
     public function addAttachment(Request $request, Task $task)
 {
@@ -251,5 +248,26 @@ public function deleteAttachment(Task $task, TaskAttachment $attachment)
 
     return response()->json(null, 204);
 }
+
+public function downloadAttachment(TaskAttachment $attachment)
+{
+    if ($attachment->task->project->user_id !== auth()->id()) {
+        abort(403, 'Unauthorized'); 
+    }
+
+    $path = $attachment->file_path; 
+    $fullPath = Storage::disk('local')->path($path); 
+
+    if (Storage::disk('local')->exists($path)) {
+        return response()->download(
+            $fullPath,
+            $attachment->original_name,
+            ['Content-Type' => $attachment->mime_type] 
+        );
+    }
+
+    abort(404, 'File not found'); 
+}
+
 
 };
