@@ -34,7 +34,7 @@ return [
     | Supported: "session"
     |
     */
-    
+
     'defaults' => [
         'guard' => 'web',
         'passwords' => 'users',
@@ -47,7 +47,7 @@ return [
         ],
 
         'api' => [
-            'driver' => 'sanctum', 
+            'driver' => 'sanctum',
             'provider' => 'users',
         ],
     ],

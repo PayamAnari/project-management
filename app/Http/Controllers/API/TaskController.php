@@ -20,8 +20,8 @@ class TaskController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Task::with(['project', 'user', 'attachments']); 
-        
+        $query = Task::with(['project', 'user', 'attachments']);
+
         if ($request->has('project_id')) {
             $project = Project::findOrFail($request->project_id);
             if ($project->user_id !== auth()->id()) {
@@ -33,9 +33,9 @@ class TaskController extends Controller
                 $q->where('user_id', auth()->id());
             });
         }
-        
+
         $tasks = $query->orderBy('priority', 'asc')->get();
-        
+
         return response()->json($tasks);
     }
 
@@ -65,7 +65,7 @@ class TaskController extends Controller
         if ($project->user_id !== auth()->id()) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
-        
+
         DB::beginTransaction();
 
         try {
@@ -83,7 +83,7 @@ class TaskController extends Controller
          if ($request->hasFile('attachments')) {
             foreach ($request->file('attachments') as $file) {
                 $path = $file->store('task_attachments');
-                
+
                 $task->attachments()->create([
                     'file_path' => $path,
                     'original_name' => $file->getClientOriginalName(),
@@ -92,7 +92,7 @@ class TaskController extends Controller
                 ]);
             }
         }
-        
+
         DB::commit();
         return response()->json($task->load('project', 'user', 'attachments'), 201);
     } catch (\Exception $e) {
@@ -178,41 +178,41 @@ class TaskController extends Controller
             'tasks.*.id' => 'required|exists:tasks,id',
             'tasks.*.priority' => 'required|numeric',
         ]);
-    
+
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-    
+
         try {
             DB::beginTransaction();
-    
+
             $updatedTasks = [];
             foreach ($request->tasks as $taskData) {
                 $task = Task::findOrFail($taskData['id']);
-                
+
                 if ($task->project->user_id !== auth()->id()) {
                     DB::rollBack();
                     return response()->json(['message' => 'Unauthorized'], 403);
                 }
-                
+
                 $task->priority = $taskData['priority'];
                 $task->save();
                 $updatedTasks[] = $task;
             }
-    
+
             DB::commit();
-    
+
             foreach ($updatedTasks as $task) {
                 event(new TaskUpdated($task, 'priority'));
             }
-    
+
             return response()->json(['message' => 'Task priorities updated successfully']);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['message' => 'Update failed'], 500);
         }
     }
-    
+
 
     public function addAttachment(Request $request, Task $task)
 {
@@ -226,7 +226,7 @@ class TaskController extends Controller
 
     $file = $request->file('file');
     $path = $file->store('task_attachments');
-    
+
     $attachment = $task->attachments()->create([
         'file_path' => $path,
         'original_name' => $file->getClientOriginalName(),
@@ -246,27 +246,29 @@ public function deleteAttachment(Task $task, TaskAttachment $attachment)
     Storage::delete($attachment->file_path);
     $attachment->delete();
 
-    return response()->json(null, 204);
-}
+    return response()->json([
+        'message' => 'Attachment deleted successfully',
+        'deleted_attachment_id' => $attachment->id
+    ]);}
 
 public function downloadAttachment(TaskAttachment $attachment)
 {
     if ($attachment->task->project->user_id !== auth()->id()) {
-        abort(403, 'Unauthorized'); 
+        abort(403, 'Unauthorized');
     }
 
-    $path = $attachment->file_path; 
-    $fullPath = Storage::disk('local')->path($path); 
+    $path = $attachment->file_path;
+    $fullPath = Storage::disk('local')->path($path);
 
     if (Storage::disk('local')->exists($path)) {
         return response()->download(
             $fullPath,
             $attachment->original_name,
-            ['Content-Type' => $attachment->mime_type] 
+            ['Content-Type' => $attachment->mime_type]
         );
     }
 
-    abort(404, 'File not found'); 
+    abort(404, 'File not found');
 }
 
 

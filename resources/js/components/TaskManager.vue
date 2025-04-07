@@ -13,8 +13,8 @@
           <!-- Auth Buttons -->
           <div class="flex flex-col sm:flex-row gap-3 items-center">
             <template v-if="!isAuthenticated">
-              <button 
-                @click="showLoginModal = true" 
+              <button
+                @click="showLoginModal = true"
                 class="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg flex items-center"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -22,8 +22,8 @@
                 </svg>
                 Login
               </button>
-              <button 
-                @click="showSignupModal = true" 
+              <button
+                @click="showSignupModal = true"
                 class="px-5 py-2.5 text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg flex items-center"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -40,8 +40,8 @@
                   </div>
                   <span class="ml-2 text-gray-700 dark:text-gray-300 font-medium">Welcome, {{ user.name }}</span>
                 </div>
-                <button 
-                  @click="logout" 
+                <button
+                  @click="logout"
                   class="px-5 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 rounded-lg transition-all duration-200 flex items-center"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -59,16 +59,16 @@
     <!-- Main Content -->
     <main class="container mx-auto px-6 py-8">
       <!-- Login Modal -->
-      <LoginModal 
-        :show="showLoginModal" 
-        @close="showLoginModal = false" 
-        @login-success="handleLoginSuccess" 
-      />     
-      
+      <LoginModal
+        :show="showLoginModal"
+        @close="showLoginModal = false"
+        @login-success="handleLoginSuccess"
+      />
+
       <!-- Signup Modal -->
-      <SignupModal 
-        :show="showSignupModal" 
-        @close="showSignupModal = false" 
+      <SignupModal
+        :show="showSignupModal"
+        @close="showSignupModal = false"
         @signup-success="handleSignupSuccess"
       />
 
@@ -76,26 +76,26 @@
       <div v-if="isAuthenticated" class="flex flex-col lg:flex-row gap-6">
         <!-- Projects Column -->
         <div class="w-full lg:w-1/3">
-          <ProjectList 
+          <ProjectList
             :projects="projects"
             :selected-project="selectedProject"
             @delete-project="handleDeleteProject"
             @project-selected="selectProject"
-            @open-project-modal="showProjectModal = true" 
+            @open-project-modal="showProjectModal = true"
           />
         </div>
-        
+
         <!-- Tasks Column -->
         <div class="w-full lg:w-2/3">
           <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <TaskList 
+            <TaskList
               :project="selectedProject"
               :tasks="tasks"
               @update:tasks="tasks = $event"
               @task-selected="selectTask"
               @open-task-modal="openTaskModal"
               @delete-task="handleDeleteTask"
-              @task-reordered="onTaskReorder" 
+              @task-reordered="onTaskReorder"
             />
           </div>
         </div>
@@ -110,14 +110,14 @@
           <h2 class="mt-4 text-xl font-medium text-gray-800 dark:text-gray-200">Please log in to manage your projects</h2>
           <p class="mt-2 text-gray-600 dark:text-gray-400">Sign in or create an account to get started</p>
           <div class="mt-6 flex justify-center gap-3">
-            <button 
-              @click="showLoginModal = true" 
+            <button
+              @click="showLoginModal = true"
               class="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors duration-200"
             >
               Login
             </button>
-            <button 
-              @click="showSignupModal = true" 
+            <button
+              @click="showSignupModal = true"
               class="px-5 py-2.5 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors duration-200"
             >
               Sign Up
@@ -127,38 +127,41 @@
       </div>
 
       <!-- Modals -->
-      <ProjectModal 
+      <ProjectModal
         :show="showProjectModal"
         :project="newProject"
         @close="showProjectModal = false"
-        @create-project="createProject" 
+        @create-project="createProject"
       />
-      
-      <TaskModal 
+
+      <TaskModal
         :show="showTaskModal"
         :task="newTask"
         :available-users="availableUsers"
         @close="showTaskModal = false"
         @create-task="createTask"
-        @file-upload="handleFileUpload" 
+        @file-upload="handleFileUpload"
       />
-      
-      <TaskDetail 
+
+      <TaskDetail
         :show="showTaskDetailModal"
         :task="selectedTask"
         :comments="comments"
         :new-comment="newComment"
         :user="user"
+        :show-notification="showNotification"
         @close="closeTaskDetail"
         @update-task-status="updateTaskStatus"
         @add-comment="addComment"
         @update-comment="newComment = $event"
-        @delete-comment="handleDeleteComment" 
+        @delete-comment="handleDeleteComment"
+        @delete-attachment="handleDeleteAttachment"
+
       />
-      
-      <Notification 
+
+      <Notification
         :notifications="notifications"
-        @remove-notification="removeNotification" 
+        @remove-notification="removeNotification"
       />
     </main>
   </div>
@@ -177,11 +180,11 @@ import axios from 'axios';
 
 export default {
   components: {
-    ProjectList, 
-    ProjectModal, 
-    TaskList,   
-    TaskModal,     
-    TaskDetail, 
+    ProjectList,
+    ProjectModal,
+    TaskList,
+    TaskModal,
+    TaskDetail,
     Notification,
     LoginModal,
     SignupModal
@@ -221,7 +224,7 @@ export default {
     };
   },
   mounted() {
-    this.checkAuth(); 
+    this.checkAuth();
     this.fetchProjects();
     this.setupRealTimeListeners();
   },
@@ -230,7 +233,7 @@ export default {
       const token = localStorage.getItem('authToken');
       if (token) {
         this.isAuthenticated = true;
-        await this.fetchUserDetails(); 
+        await this.fetchUserDetails();
       } else {
         this.isAuthenticated = false;
       }
@@ -278,7 +281,7 @@ export default {
       }
     },
     async openTaskModal() {
-      this.newTask = { 
+      this.newTask = {
         title: '',
         description: '',
         due_date: '',
@@ -287,7 +290,7 @@ export default {
         attachments: [],
         assigned_user_id: ''
       };
-      await this.fetchUsers(); 
+      await this.fetchUsers();
       this.showTaskModal = true;
     },
     handleFileUpload(files) {
@@ -495,6 +498,18 @@ export default {
       } catch (error) {
         this.showNotification('Error', 'Failed to update task order', 'error');
         console.error('Error updating task order:', error.response?.data || error);
+      }
+    },
+    async handleDeleteAttachment(attachmentId) {
+      try {
+        await axios.delete(`/api/tasks/${taskId}/attachments/${attachmentId}`, {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
+        });
+        this.newTask.attachments = this.newTask.attachments.filter(a => a.id !== attachmentId);
+        this.showNotification('Success', 'Attachment deleted', 'success');
+      } catch (error) {
+        this.showNotification('Error', 'Failed to delete attachment', 'error');
+        console.error('Error deleting attachment:', error);
       }
     },
     setupRealTimeListeners() {
