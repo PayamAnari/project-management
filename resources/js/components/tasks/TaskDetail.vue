@@ -169,7 +169,6 @@ export default {
       headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
     });
 
-    // Update local state immediately
     this.task.attachments = this.task.attachments.filter(a => a.id !== attachmentId);
     this.showNotification('Success', 'Attachment deleted', 'success');
   } catch (error) {

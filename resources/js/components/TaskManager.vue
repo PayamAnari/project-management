@@ -156,7 +156,6 @@
         @update-comment="newComment = $event"
         @delete-comment="handleDeleteComment"
         @delete-attachment="handleDeleteAttachment"
-
       />
 
       <Notification

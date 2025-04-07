@@ -25,9 +25,9 @@
 
     <!-- Comments list -->
     <div class="space-y-4 max-h-96 overflow-y-auto pr-2">
-      <div 
-        v-for="comment in comments" 
-        :key="comment.id" 
+      <div
+        v-for="comment in comments"
+        :key="comment.id"
         class="relative p-4 rounded-lg bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-200 group"
       >
         <!-- Comment header -->
@@ -43,14 +43,14 @@
               <div class="text-xs text-gray-500 dark:text-gray-400">{{ formatDateTime(comment.created_at) }}</div>
             </div>
           </div>
-          
+
           <!-- Delete button - only visible on hover and if user has permission -->
-          <button 
+          <button
             v-if="canDeleteComment(comment)"
             @click="confirmDelete(comment)"
-            class="absolute top-4 right-4 p-1 rounded-full 
+            class="absolute top-4 right-4 p-1 rounded-full
                     text-gray-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-gray-200 dark:hover:bg-gray-600
-                    opacity-0 group-hover:opacity-100 
+                    opacity-0 group-hover:opacity-100
                     transition-all duration-200 ease-in-out"
             title="Delete comment"
           >
@@ -66,7 +66,7 @@
         </div>
       </div>
 
-      <div v-if="comments.length === 0" class="text-center py-6 text-gray-500 dark:text-gray-400">
+      <div v-if="comments.length === 0" class="text-center py-1 text-gray-500 dark:text-gray-400">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto text-gray-300 dark:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
         </svg>
@@ -82,14 +82,14 @@ export default {
   props: {
     comments: Array,
     newComment: String,
-    currentUser: Object 
+    currentUser: Object
   },
   methods: {
     formatDateTime(dateTimeString) {
       if (!dateTimeString) return '';
-      const options = { 
-        year: 'numeric', 
-        month: 'short', 
+      const options = {
+        year: 'numeric',
+        month: 'short',
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit'
@@ -97,7 +97,7 @@ export default {
       return new Date(dateTimeString).toLocaleString(undefined, options);
     },
     canDeleteComment(comment) {
-      return this.currentUser && 
+      return this.currentUser &&
              (this.currentUser.id === comment.user.id || this.currentUser.is_admin);
     },
     confirmDelete(comment) {
