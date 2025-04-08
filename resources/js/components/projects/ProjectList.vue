@@ -2,18 +2,21 @@
   <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
     <div class="flex justify-between items-center mb-6">
       <h3 class="text-xl font-bold text-gray-800 dark:text-white">Projects</h3>
-      <button 
-        @click="$emit('open-project-modal')" 
-        class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
-      >
+      <button
+        @click="$emit('open-project-modal')"
+        class="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg transition-all duration-200 flex items-center"
+        >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
         Add Project
       </button>
     </div>
 
     <div class="space-y-3">
-      <div 
-        v-for="project in projects" 
-        :key="project.id" 
+      <div
+        v-for="project in projects"
+        :key="project.id"
         class="group relative p-4 bg-white dark:bg-gray-700 rounded-lg shadow-xs border border-gray-200 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-200 cursor-pointer"
         :class="{'border-l-4 border-blue-500 dark:border-blue-400': selectedProject && selectedProject.id === project.id}"
       >
@@ -21,14 +24,14 @@
         <div @click="$emit('project-selected', project)" class="pr-8">
           <h4 class="font-medium text-gray-800 dark:text-gray-100">{{ project.name }}</h4>
           <div class="flex items-center mt-1 text-sm">
-            <span 
+            <span
               class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
               :class="getStatusClass(project.status)"
             >
               {{ formatStatus(project.status) }}
             </span>
-            <span 
-              v-if="project.due_date" 
+            <span
+              v-if="project.due_date"
               class="ml-2 text-gray-500 dark:text-gray-400"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -38,10 +41,10 @@
             </span>
           </div>
         </div>
-        
+
         <!-- Delete Button -->
-        <button 
-          @click.stop="confirmDelete(project)" 
+        <button
+          @click.stop="confirmDelete(project)"
           class="absolute top-3 right-3 p-1 text-gray-400 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all duration-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -50,16 +53,16 @@
         </button>
       </div>
 
-      <div 
-        v-if="projects.length === 0" 
+      <div
+        v-if="projects.length === 0"
         class="text-center py-8 text-gray-500 dark:text-gray-400"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-300 dark:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
         <p class="mt-2">No projects yet</p>
-        <button 
-          @click="$emit('open-project-modal')" 
+        <button
+          @click="$emit('open-project-modal')"
           class="mt-3 px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors duration-200"
         >
           Create your first project
