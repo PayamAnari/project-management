@@ -215,27 +215,36 @@ class TaskController extends Controller
 
 
     public function addAttachment(Request $request, Task $task)
-{
-    if ($task->project->user_id !== auth()->id()) {
-        return response()->json(['message' => 'Unauthorized'], 403);
+    {
+        if ($task->project->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'attachments' => 'required|array',
+            'attachments.*' => 'file|max:10240' // 10MB max per file
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        $newAttachments = [];
+        foreach ($request->file('attachments') as $file) {
+            $path = $file->store('task_attachments');
+
+            $attachment = $task->attachments()->create([
+                'file_path' => $path,
+                'original_name' => $file->getClientOriginalName(),
+                'mime_type' => $file->getClientMimeType(),
+                'size' => $file->getSize()
+            ]);
+
+            $newAttachments[] = $attachment;
+        }
+
+        return response()->json($newAttachments, 201);
     }
-
-    $request->validate([
-        'file' => 'required|file|max:10240' // 10MB max
-    ]);
-
-    $file = $request->file('file');
-    $path = $file->store('task_attachments');
-
-    $attachment = $task->attachments()->create([
-        'file_path' => $path,
-        'original_name' => $file->getClientOriginalName(),
-        'mime_type' => $file->getClientMimeType(),
-        'size' => $file->getSize()
-    ]);
-
-    return response()->json($attachment, 201);
-}
 
 public function deleteAttachment(Task $task, TaskAttachment $attachment)
 {
