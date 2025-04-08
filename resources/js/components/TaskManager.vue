@@ -445,30 +445,6 @@ export default {
         console.error('Error deleting comment:', error);
       }
     },
-    async updateTaskStatus() {
-      try {
-        const taskData = {
-          title: this.selectedTask.title || '',
-          description: this.selectedTask.description || '',
-          project_id: this.selectedTask.project_id,
-          status: this.selectedTask.status,
-          priority: this.selectedTask.priority || 0,
-          due_date: this.selectedTask.due_date || null
-        };
-        await axios.put(`/api/tasks/${this.selectedTask.id}`, taskData, {
-          headers: { 'Authorization': `Bearer ${localStorage.getItem('authToken')}` }
-        });
-        const index = this.tasks.findIndex(t => t.id === this.selectedTask.id);
-        if (index !== -1) {
-          this.tasks[index].status = this.selectedTask.status;
-        }
-        this.showNotification('Success', 'Task status updated', 'success');
-        this.showTaskDetailModal = false;
-      } catch (error) {
-        this.showNotification('Error', 'Failed to update task status', 'error');
-        console.error('Error updating task status:', error);
-      }
-    },
     async handleDeleteTask(taskId) {
       try {
         await axios.delete(`/api/tasks/${taskId}`, {
