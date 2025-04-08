@@ -96,6 +96,7 @@
               @open-task-modal="openTaskModal"
               @delete-task="handleDeleteTask"
               @task-reordered="onTaskReorder"
+              :show-notification="showNotification"
             />
           </div>
         </div>
