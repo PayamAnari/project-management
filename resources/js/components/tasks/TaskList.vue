@@ -1,13 +1,13 @@
 <template>
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6" v-if="project">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 p-6" v-if="project">
       <div class="flex justify-between items-center mb-6">
         <div>
-          <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Tasks for {{ project.name }}</h3>
+          <h3 class="text-xl font-semibold text-gray-800 dark:text-white">Tasks for <span class="text-blue-600">{{ project.name }}</span></h3>
           <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">{{ tasks.length }} tasks</p>
         </div>
         <button
           @click="$emit('open-task-modal')"
-          class="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg transition-all duration-200 flex items-center"
+          class="px-4 py-2 text-white bg-blue-600 shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-lg transition-all duration-200 flex items-center"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -25,7 +25,7 @@
         class="space-y-3"
       >
         <template #item="{element}">
-          <div class="group relative p-4 bg-white dark:bg-gray-700 rounded-lg shadow-xs border border-gray-100 dark:border-gray-600 hover:border-blue-200 dark:hover:border-blue-400 transition-all duration-200">
+          <div class="group relative p-4 bg-white dark:bg-gray-700 rounded-lg shadow-xs border border-gray-100 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 transition-all duration-200">
             <!-- Drag handle -->
             <div class="drag-handle absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity cursor-move">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -105,7 +105,7 @@
             <!-- Delete Button -->
             <button
               @click.stop="confirmDelete(element)"
-              class="absolute top-3 right-3 text-gray-400 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all duration-200 p-1"
+              class="absolute top-3 right-3 p-1 text-gray-400 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all duration-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-600"
               title="Delete task"
             >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

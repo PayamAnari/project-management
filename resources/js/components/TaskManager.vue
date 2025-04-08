@@ -1,12 +1,12 @@
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+  <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
     <!-- Header -->
-    <header class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+    <header class="bg-white dark:bg-gray-800 shadow-md border-b border-gray-200 dark:border-gray-700">
       <div class="container mx-auto px-6 py-4">
         <div class="flex flex-col md:flex-row justify-between items-center">
           <!-- Logo/Branding -->
           <div class="mb-4 md:mb-0">
-            <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Project Management</h1>
+            <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Project <span class="text-blue-500">Management</span></h1>
             <p class="text-sm text-gray-600 dark:text-gray-400">Manage your projects and tasks efficiently</p>
           </div>
 
@@ -42,7 +42,7 @@
                 </div>
                 <button
                   @click="logout"
-                  class="px-5 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 rounded-lg transition-all duration-200 flex items-center"
+                  class="px-5 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 shadow-md bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 rounded-lg transition-all duration-200 flex items-center"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -87,7 +87,7 @@
 
         <!-- Tasks Column -->
         <div class="w-full lg:w-2/3">
-          <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+          <div class="">
             <TaskList
               :project="selectedProject"
               :tasks="tasks"
